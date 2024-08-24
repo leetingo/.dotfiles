@@ -128,7 +128,7 @@ return {
             },
         }
 
-        vim.keymap.set('n', '<leader>dB', function() require("dap").set_breakpoint(vim.vim.fn.input("Breakpoint condition: ")) end)
+        vim.keymap.set('n', '<leader>dB', function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end)
         vim.keymap.set('n', '<leader>db', function() require("dap").toggle_breakpoint() end)
         vim.keymap.set('n', '<F5>', function() require("dap").continue() end)
         vim.keymap.set('n', '<F6>', function() require("dap").pause() end)
