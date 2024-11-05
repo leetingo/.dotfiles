@@ -10,8 +10,8 @@ return {
         "hrsh7th/nvim-cmp",
         "saadparwaiz1/cmp_luasnip",
         "JoosepAlviste/nvim-ts-context-commentstring",
-        "nvimtools/none-ls.nvim",
-        "jay-babu/mason-null-ls.nvim",
+        -- "nvimtools/none-ls.nvim",
+        -- "jay-babu/mason-null-ls.nvim",
     },
     config = function()
         local cmp = require('cmp')
@@ -19,8 +19,8 @@ return {
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
-                "rust_analyzer",
-                "gopls",
+                -- "rust_analyzer",
+                -- "gopls",
             },
             handlers = {
                 function(server_name)
@@ -51,16 +51,14 @@ return {
                 end,
             }
         })
-        
-        require("null-ls").setup()
-        require("mason-null-ls").setup({
-            ensure_installed = {
-                "golangci-lint",
-                "gomodifytags",
-            },
-            automatic_installation = true,
-            handlers = {},
-        })
+
+        -- require("null-ls").setup()
+        -- require("mason-null-ls").setup({
+        --     ensure_installed = {
+        --     },
+        --     automatic_installation = true,
+        --     handlers = {},
+        -- })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
         cmp.setup({
