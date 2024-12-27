@@ -4,43 +4,27 @@ return {
   lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
-     provider = "copilot",
-     -- vendors = {
-     --   ---@type AvanteProvider
-     --   ollama = {
-     --     ["local"] = true,
-     --     endpoint = "192.168.6.3:11434/v1",
-     --     model = "qwen2.5-coder",
-     --     parse_curl_args = function(opts, code_opts)
-     --       return {
-     --         url = opts.endpoint .. "/chat/completions",
-     --         headers = {
-     --           ["Accept"] = "application/json",
-     --           ["Content-Type"] = "application/json",
-     --         },
-     --         body = {
-     --           model = opts.model,
-     --           messages = require("avante.providers").copilot.parse_message(code_opts), -- you can make your own message, but this is very advanced
-     --           max_tokens = 32*1024,
-     --           stream = true,
-     --         },
-     --       }
-     --     end,
-     --     parse_response_data = function(data_stream, event_state, opts)
-     --       require("avante.providers").openai.parse_response(data_stream, event_state, opts)
-     --     end,
-     --   },
-     -- },
+    -- add any opts here
+    provider = "copilot"
+    -- provider = "ollama",
+    -- vendors = {
+    --   ollama = {
+    --     __inherited_from = "openai",
+    --     api_key_name = "",
+    --     endpoint = "http://192.168.6.3:11434/v1",
+    --     model = "qwen2.5-coder:14b",
+    --   },
+    -- },
   },
   -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
   build = "make",
   -- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
   dependencies = {
-    "nvim-treesitter/nvim-treesitter",
     "stevearc/dressing.nvim",
     "nvim-lua/plenary.nvim",
     "MunifTanjim/nui.nvim",
     --- The below dependencies are optional,
+    "hrsh7th/nvim-cmp", -- autocompletion for avante commands and mentions
     "nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
     "zbirenbaum/copilot.lua", -- for providers='copilot'
     {
