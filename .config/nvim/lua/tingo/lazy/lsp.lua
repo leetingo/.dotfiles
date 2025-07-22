@@ -14,42 +14,27 @@ return {
         -- "jay-babu/mason-null-ls.nvim",
     },
     config = function()
-        local cmp = require('cmp')
+        local capabilities = require('cmp_nvim_lsp').default_capabilities()
+        vim.lsp.config('*', {
+            capabilities = capabilities,
+        })
+        vim.lsp.config('lua_ls', {
+            settings = {
+                Lua = {
+                    runtime = {
+                        version = 'LuaJIT',
+                    },
+                    diagnostics = {
+                        globals = { "vim", "require" }
+                    },
+                },
+            },
+        })
         require("mason").setup()
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
-                -- "rust_analyzer",
-                -- "gopls",
             },
-            handlers = {
-                function(server_name)
-                    local cmp_lsp = require("cmp_nvim_lsp")
-                    local capabilities = vim.tbl_deep_extend(
-                        "force",
-                        {},
-                        vim.lsp.protocol.make_client_capabilities(),
-                        cmp_lsp.default_capabilities())
-
-                    require("lspconfig")[server_name].setup {
-                        capabilities = capabilities,
-                    }
-                end,
-
-                -- Enable global diagnostics
-                ["lua_ls"] = function()
-                    local lspconfig = require("lspconfig")
-                    lspconfig.lua_ls.setup {
-                        settings = {
-                            Lua = {
-                                diagnostics = {
-                                    globals = { "vim" }
-                                }
-                            }
-                        }
-                    }
-                end,
-            }
         })
 
         -- require("null-ls").setup()
@@ -60,6 +45,7 @@ return {
         --     handlers = {},
         -- })
 
+        local cmp = require('cmp')
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
         cmp.setup({
             snippet = {
@@ -76,6 +62,7 @@ return {
             sources = cmp.config.sources({
                 { name = 'nvim_lsp' },
                 { name = 'luasnip' }, -- For luasnip users.
+                { name = 'path' },
             }, {
                 { name = 'buffer' },
             })
