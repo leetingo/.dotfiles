@@ -17,6 +17,8 @@ return {
             return
         end
 
+        local lombok_jar = vim.env.HOME .. "/.local/share/nvim/mason/packages/jdtls/lombok.jar"
+
         local bundles = {}
 
         local java_debug_path = mason_path .. "/packages/java-debug-adapter/extension/server/com.microsoft.java.debug.plugin-*.jar"
@@ -30,27 +32,28 @@ return {
         local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
         local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/workspace/" .. project_name
 
-        local config = {
-            cmd = {
-                "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java",
-                "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-                "-Dosgi.bundles.defaultStartLevel=4",
-                "-Declipse.product=org.eclipse.jdt.ls.core.product",
-                "-Dlog.level=ALL",
-                "-Xmx1G",
-                "--add-modules=ALL-SYSTEM",
-                "--add-opens", "java.base/java.util=ALL-UNNAMED",
-                "--add-opens", "java.base/java.lang=ALL-UNNAMED",
-                "-jar", launcher_jar,
-                "-configuration", jdtls_home .. (vim.fn.has("mac") == 1 and "/config_mac" or "/config_linux"),
-                "-data", workspace_dir,
-            },
-            root_dir = require("jdtls").setup.find_root({ ".git", "mvnw", "gradlew" }),
+        local cmd = {
+            "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java",
+            "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+            "-Dosgi.bundles.defaultStartLevel=4",
+            "-Declipse.product=org.eclipse.jdt.ls.core.product",
+            "-Dlog.level=ALL",
+            "-Xmx1G",
+            "--add-modules=ALL-SYSTEM",
+            "--add-opens", "java.base/java.util=ALL-UNNAMED",
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+            "-javaagent:" .. lombok_jar,
+            "-jar", launcher_jar,
+            "-configuration", jdtls_home .. (vim.fn.has("mac") == 1 and "/config_mac" or "/config_linux"),
+            "-data", workspace_dir,
+        }
 
+        local config = {
+            root_dir = require("jdtls").setup.find_root({ ".git", "mvnw", "gradlew" }),
+            cmd = cmd,
             init_options = {
                 bundles = bundles,
             },
-
         }
 
         vim.api.nvim_create_autocmd("LspAttach", {
