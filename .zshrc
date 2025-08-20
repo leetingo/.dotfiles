@@ -24,7 +24,7 @@ ZSH_THEME="robbyrussell"
 # HYPHEN_INSENSITIVE="true"
 
 # Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
+zstyle ':omz:update' mode disabled  # disable automatic updates
 # zstyle ':omz:update' mode auto      # update automatically without asking
 # zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
@@ -70,7 +70,12 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+
+# nvm
+zstyle ':omz:plugins:nvm' lazy yes
+
 plugins=(
+    nvm
     git
     zsh-autosuggestions
 )
@@ -106,9 +111,19 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim="nvim"
-alias clr="clear"
 
-bindkey -s ^f "~/.local/scripts/tmux-sessionizer\n"
+export PATH=$HOME/.local/scripts:$PATH
+bindkey -s ^f "tmux-sessionizer\n"
+bindkey -s ^b "ssh-connector\n"
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
+
+# JAVA
+export JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-1.8.0_452/Contents/Home
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar
+
+# Maven
+export PATH=/opt/apache-maven-3.9.11/bin:$PATH
+

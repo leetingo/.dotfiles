@@ -1,0 +1,372 @@
+#!/bin/bash
+
+# 服务器配置文件路径
+serverFile="$HOME/.local/scripts/ssh_serverlist.txt"
+
+# 颜色定义
+textColorRed="31m"
+textColorGreen="32m"
+
+# 一行显示多少条
+showRowCount=30
+
+# 服务器列表数组
+serverList=()
+# 服务器总数
+serverCount=0
+# 当前开始位置
+startIndex=0
+# 结束位置
+endIndex=$showRowCount
+# 搜索关键词
+searchKey=""
+
+# 颜色函数
+bgColor() {
+    local text="$1"
+    local color="$2"
+    echo -e "\033[1;33;${color}${text}\033[0m"
+}
+
+textColor() {
+    local text="$1"
+    local color="$2"
+    echo -e "\033[1;33;${color}${text}\033[0m"
+}
+
+# 初始化服务器计数
+initServerCount() {
+    local c=$1
+    serverCount=$c
+    if [ $serverCount -lt $showRowCount ]; then
+        endIndex=$serverCount
+    else
+        endIndex=$((startIndex + showRowCount))
+    fi
+}
+
+# 构建服务器列表
+buildServerList() {
+    serverList=()
+    while IFS= read -r line; do
+        line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        if [ -z "$line" ] || [[ $line == \#* ]]; then
+            continue
+        fi
+        
+        # 使用Python脚本中的相同逻辑分割行内容
+        read -ra cols <<< "$line"
+        if [ ${#cols[@]} -lt 3 ]; then
+            continue
+        fi
+        
+        # 提取IP、用户名和备注
+        ip=${cols[0]}
+        user=${cols[1]}
+        # 将剩余部分作为备注
+        comment=""
+        for ((i=2; i<${#cols[@]}; i++)); do
+            if [ -z "$comment" ]; then
+                comment="${cols[$i]}"
+            else
+                comment="$comment ${cols[$i]}"
+            fi
+        done
+        
+                
+        serverList+=("$ip $user $comment")
+    done < "$serverFile"
+    
+    initServerCount ${#serverList[@]}
+}
+
+# 查找系统命令
+findSysCmd() {
+    local cmd="$1"
+    command -v "$cmd" >/dev/null 2>&1
+}
+
+# 登录提示
+sayLogin() {
+    local text="$1"
+    if findSysCmd "cowsay"; then
+        local cmd="cowsay -e '@@' 'Login to $text'"
+        if findSysCmd "lolcat"; then
+            cmd="$cmd | lolcat 2>/dev/null"
+        fi
+        eval "$cmd"
+    else
+        echo "Login to: $(textColor "$text" "$textColorGreen")"
+    fi
+}
+
+# 登录服务器
+loginServer() {
+    local server="$1"
+    clearScreen
+    
+    # 解析服务器信息
+    local ip=$(echo "$server" | awk '{print $1}')
+    local user=$(echo "$server" | awk '{print $2}')
+    local comment=$(echo "$server" | cut -d' ' -f3-)
+    
+    sayLogin "$comment"
+    
+    local port_args=""
+    if [[ $ip == *:* ]]; then
+        local host=${ip%:*}
+        local port=${ip#*:}
+        port_args="-p $port"
+        ip=$host
+    fi
+    
+    ssh $port_args "$user@$ip"
+}
+
+# 清屏
+clearScreen() {
+    if findSysCmd "clear"; then
+        clear
+    fi
+}
+
+# 获取当前显示的服务器列表
+getServerList() {
+    if [ -n "$searchKey" ]; then
+        local sList=()
+        for server in "${serverList[@]}"; do
+            local ip=$(echo "$server" | awk '{print $1}')
+            local comment=$(echo "$server" | cut -d' ' -f3-)
+            if [[ $ip == *"$searchKey"* ]] || [[ $comment == *"$searchKey"* ]]; then
+                sList+=("$server")
+            fi
+        done
+        # 以特殊格式返回列表，避免被拆分
+        local result=""
+        for server in "${sList[@]}"; do
+            result="$result|$server"
+        done
+        echo "$result"
+    else
+        # 以特殊格式返回列表，避免被拆分
+        local result=""
+        for server in "${serverList[@]}"; do
+            result="$result|$server"
+        done
+        echo "$result"
+    fi
+}
+
+# 打印服务器列表
+printServers() {
+    clearScreen
+    local num=$startIndex
+    
+    # 获取当前显示的服务器列表
+    local rawList=$(getServerList)
+    # 将特殊格式的列表转换为数组
+    local currentList=()
+    if [ -n "$rawList" ]; then
+        # 移除开头的|字符
+        rawList="${rawList:1}"
+        # 按|分割字符串
+        IFS='|' read -ra currentList <<< "$rawList"
+    fi
+    local currentCount=${#currentList[@]}
+    
+    # 更新显示范围
+    if [ $currentCount -lt $showRowCount ]; then
+        endIndex=$currentCount
+    else
+        if [ $endIndex -gt $currentCount ]; then
+            endIndex=$currentCount
+        fi
+    fi
+    
+    # 显示搜索关键词
+    local kw=""
+    if [ -z "$searchKey" ] || [ ${#searchKey} -eq 0 ]; then
+        kw="$(textColor "/关键词" "$textColorGreen")"
+    else
+        kw="$(textColor "/" "$textColorGreen")$(textColor "$searchKey" "$textColorRed")"
+    fi
+    
+    echo "一共有 $(textColor "$currentCount" "$textColorRed") 个服务器,下一页[ $(textColor "n" "$textColorGreen") ],上一页[ $(textColor "p" "$textColorGreen") ],搜索[ $kw ],取消搜索[ $(textColor "/" "$textColorGreen") ],退出[ $(textColor "Ctrl+C" "$textColorGreen") ]或者[ $(textColor "Enter" "$textColorGreen") ]"
+    printf "\033[1;33;44m%-3s\t%-32s\t%-12s\t%-32s\033[0m\n" "编号" "IP" "账号" "备注"
+    
+    # 显示当前页的服务器
+    for ((j=startIndex; j<endIndex; j++)); do
+        if [ $j -lt ${#currentList[@]} ]; then
+            local server="${currentList[$j]}"
+            # 使用read命令正确解析服务器信息
+            read -r ip user comment <<< "$server"
+            
+            # 处理搜索关键词高亮
+            local display_ip="$ip"
+            local display_comment="$comment"
+            if [ -n "$searchKey" ] && [ ${#searchKey} -gt 0 ]; then
+                # 使用不同的分隔符避免/字符冲突
+                local colored_searchKey=$(textColor "$searchKey" "$textColorRed")
+                display_ip=$(echo "$ip" | sed "s|$searchKey|$colored_searchKey|g")
+                display_comment=$(echo "$comment" | sed "s|$searchKey|$colored_searchKey|g")
+            fi
+            
+            printf "\033[1;33;31m%-3s\033[0m\t%-32s\t%-12s\t%-32s\n" "$num" "$display_ip" "$user" "$display_comment"
+            num=$((num + 1))
+        fi
+    done
+    echo ""
+}
+
+# 查找服务器
+findServer() {
+    local i=$1
+    # 获取当前显示的服务器列表
+    local rawList=$(getServerList)
+    # 将特殊格式的列表转换为数组
+    local currentList=()
+    if [ -n "$rawList" ]; then
+        # 移除开头的|字符
+        rawList="${rawList:1}"
+        # 按|分割字符串
+        IFS='|' read -ra currentList <<< "$rawList"
+    fi
+    
+    if [ $i -lt 0 ] || [ $i -ge ${#currentList[@]} ]; then
+        echo ""
+    else
+        echo "${currentList[$i]}"
+    fi
+}
+
+# 显示上一页
+showPrePage() {
+    if [ $startIndex -eq 0 ]; then
+        return
+    fi
+    local nstartIndex=$((startIndex - showRowCount))
+    if [ $nstartIndex -lt 0 ]; then
+        nstartIndex=0
+    fi
+    startIndex=$nstartIndex
+    local nendIndex=$((startIndex + showRowCount))
+    if [ $nendIndex -gt $serverCount ]; then
+        nendIndex=$serverCount
+    fi
+    endIndex=$nendIndex
+}
+
+# 显示下一页
+showNextPage() {
+    # 获取当前显示的服务器列表
+    local rawList=$(getServerList)
+    # 将特殊格式的列表转换为数组
+    local currentList=()
+    if [ -n "$rawList" ]; then
+        # 移除开头的|字符
+        rawList="${rawList:1}"
+        # 按|分割字符串
+        IFS='|' read -ra currentList <<< "$rawList"
+    fi
+    local currentCount=${#currentList[@]}
+    
+    if [ $endIndex -ge $currentCount ]; then
+        return
+    fi
+    local nstartIndex=$endIndex
+    if [ $nstartIndex -gt $((currentCount - 1)) ]; then
+        nstartIndex=$((currentCount - 1))
+    fi
+    startIndex=$nstartIndex
+    local nendIndex=$((startIndex + showRowCount))
+    if [ $nendIndex -gt $currentCount ]; then
+        nendIndex=$currentCount
+    fi
+    endIndex=$nendIndex
+}
+
+# 显示服务器信息并登录
+showServer() {
+    local s=$1
+    local server=$(findServer "$s")
+    if [ -n "$server" ]; then
+        loginServer "$server"
+    else
+        echo "$(textColor "没有找到服务器信息." "$textColorRed")"
+    fi
+}
+
+# 搜索模式
+searchModel() {
+    local q="$1"
+    if [ -n "$q" ] && [ ${#q} -gt 0 ]; then
+        searchKey="$q"
+    else
+        searchKey=""
+    fi
+    startIndex=0
+    # 重新计算结束索引
+    # 获取当前显示的服务器列表
+    local rawList=$(getServerList)
+    # 将特殊格式的列表转换为数组
+    local currentList=()
+    if [ -n "$rawList" ]; then
+        # 移除开头的|字符
+        rawList="${rawList:1}"
+        # 按|分割字符串
+        IFS='|' read -ra currentList <<< "$rawList"
+    fi
+    local currentCount=${#currentList[@]}
+    if [ $currentCount -lt $showRowCount ]; then
+        endIndex=$currentCount
+    else
+        endIndex=$showRowCount
+    fi
+}
+
+# 等待退出
+waitForExit() {
+    while true; do
+        printServers
+        echo -n ">输入服务器编号 [$(textColor $startIndex $textColorRed)-$(textColor $((endIndex-1)) $textColorRed)] 或命令: "
+        read -r line
+        line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        
+        # enter exit
+        if [ -z "$line" ]; then
+            break
+        elif [ "$line" = "p" ]; then
+            showPrePage
+        elif [ "$line" = "n" ]; then
+            showNextPage
+        elif [[ $line == /* ]]; then
+            searchModel "${line:1}"
+        elif [[ $line =~ ^[0-9]+$ ]]; then
+            # 只有数字才传递给showServer
+            showServer "$line"
+            # 此处如果不退出，当退出SSH后，会回到命令窗口不，本地会多出很多该脚本进程
+            break
+        else
+            echo "$(textColor "无效输入，请输入有效的服务器编号或命令" "$textColorRed")"
+        fi
+    done
+}
+
+# 主函数
+main() {
+    if ! findSysCmd "ssh"; then
+        echo "$(textColor "没有找到ssh命令，无法继续执行" "$textColorRed")"
+        exit 1
+    fi
+    
+    buildServerList
+    
+    if [ $# -eq 0 ]; then
+        waitForExit
+    else
+        showServer "$1"
+    fi
+}
+
+# 执行主函数
+main "$@"

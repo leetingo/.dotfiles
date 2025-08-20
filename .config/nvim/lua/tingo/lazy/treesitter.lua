@@ -2,7 +2,10 @@ return {
     "nvim-treesitter/nvim-treesitter",
     event = "VeryLazy",
     dependencies = {
-        "nvim-treesitter/nvim-treesitter-textobjects",
+        {
+            "nvim-treesitter/nvim-treesitter-textobjects",
+            event = "VeryLazy"
+        },
         "windwp/nvim-ts-autotag",
         -- "nvim-treesitter/nvim-treesitter-context",
         "RRethy/vim-illuminate",
