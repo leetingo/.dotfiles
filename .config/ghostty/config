@@ -1,0 +1,12 @@
+font-family = Caskaydia Mono Nerd Font
+font-size = 16
+
+cursor-style = block
+
+theme = rose-pine
+background-opacity = 0.85
+background-blur = true
+# background = #000000
+
+macos-non-native-fullscreen = false
+macos-titlebar-style = transparent
