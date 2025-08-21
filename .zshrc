@@ -127,3 +127,5 @@ export CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar
 # Maven
 export PATH=/opt/apache-maven-3.9.11/bin:$PATH
 
+export PATH=$HOME/.nvm/versions/node/v22.17.1/bin:$PATH
+
