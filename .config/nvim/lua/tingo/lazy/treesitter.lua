@@ -1,55 +1,34 @@
 return {
     "nvim-treesitter/nvim-treesitter",
-    event = "VeryLazy",
+    branch = "main",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-        {
-            "nvim-treesitter/nvim-treesitter-textobjects",
-            event = "VeryLazy"
-        },
         "windwp/nvim-ts-autotag",
-        -- "nvim-treesitter/nvim-treesitter-context",
         "RRethy/vim-illuminate",
     },
     build = ":TSUpdate",
     config = function()
-        require('nvim-treesitter.configs').setup({
-            -- A list of parser names
-            ensure_installed = { "vim", "vimdoc", "lua" },
-
-            -- Install parsers synchronously (only applied to `ensure_installed`)
-            sync_install = false,
-
-            -- Automatically install missing parsers when entering buffer
-            -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-            auto_install = true,
-
-            highlight = {
-                -- `false` will disable the whole extension
-                enable = true,
-
-                -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-                -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-                -- Using this option may slow down your editor, and you may see some duplicate highlights.
-                -- Instead of true it can also be a list of languages
-                additional_vim_regex_highlighting = { "markdown" },
-            },
-
-            textobjects = {
-                select = {
-                    enable = true,
-
-                    lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-
-                    keymaps = {
-                        -- You can use the capture groups defined in textobjects.scm
-                        ["af"] = "@function.outer",
-                        ["if"] = "@function.inner",
-                        ["ac"] = "@class.outer",
-                        ["ic"] = "@class.inner",
-                    },
-                }
-            }
-        })
+        require('nvim-treesitter').setup()
+        require('nvim-treesitter').install({ "vim", "vimdoc", "lua" })
         require('nvim-ts-autotag').setup()
+
+        -- Enable treesitter highlighting and auto-install missing parsers
+        local available = require('nvim-treesitter').get_available()
+        local available_set = {}
+        for _, lang in ipairs(available) do
+            available_set[lang] = true
+        end
+
+        vim.api.nvim_create_autocmd("FileType", {
+            callback = function(ev)
+                local lang = vim.treesitter.language.get_lang(vim.bo[ev.buf].filetype)
+                if not lang then return end
+                if pcall(vim.treesitter.language.inspect, lang) then
+                    vim.treesitter.start(ev.buf)
+                elseif available_set[lang] then
+                    require('nvim-treesitter').install({ lang })
+                end
+            end,
+        })
     end
 }
