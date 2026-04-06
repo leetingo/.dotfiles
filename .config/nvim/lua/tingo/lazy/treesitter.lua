@@ -1,22 +1,37 @@
 return {
     {
         "nvim-treesitter/nvim-treesitter",
-        event = { "BufReadPost", "BufNewFile" },
+        branch = "main",
+        lazy = false,
         dependencies = {
             "windwp/nvim-ts-autotag",
             "nvim-treesitter/nvim-treesitter-context",
         },
         build = ":TSUpdate",
         config = function()
-            require('nvim-treesitter.configs').setup({
-                ensure_installed = { "vim", "vimdoc", "lua" },
-                auto_install = true,
-                highlight = {
-                    enable = true,
-                },
-                indent = {
-                    enable = true,
-                },
+            local required_parsers = { "vim", "vimdoc", "lua" }
+            local treesitter = require("nvim-treesitter")
+
+            treesitter.setup({
+                install_dir = vim.fs.joinpath(vim.fn.stdpath("data"), "site"),
+            })
+
+            treesitter.install(required_parsers)
+
+            local group = vim.api.nvim_create_augroup("TingoTreesitter", { clear = true })
+            vim.api.nvim_create_autocmd("FileType", {
+                group = group,
+                pattern = "*",
+                callback = function(args)
+                    if vim.bo[args.buf].filetype == "markdown" then
+                        vim.bo[args.buf].syntax = "on"
+                    end
+
+                    local ok = pcall(vim.treesitter.start, args.buf)
+                    if ok then
+                        vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+                    end
+                end,
             })
 
             vim.api.nvim_create_autocmd("FileType", {
