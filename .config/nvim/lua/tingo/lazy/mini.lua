@@ -1,7 +1,7 @@
 return {
     {
         'echasnovski/mini.ai',
-        event = { "BufReadPre", "BufNewFile" },
+        event = "VeryLazy",
         version = false,
         config = function()
             local ai = require('mini.ai')
@@ -21,7 +21,7 @@ return {
     },
     {
         'echasnovski/mini.pairs',
-        event = { "BufReadPre", "BufNewFile" },
+        event = "VeryLazy",
         version = false,
         config = function()
             require('mini.pairs').setup({
@@ -40,7 +40,7 @@ return {
     },
     {
         'echasnovski/mini.surround',
-        event = { "BufReadPre", "BufNewFile" },
+        event = "VeryLazy",
         version = false,
         config = function()
             require('mini.surround').setup()
@@ -48,22 +48,10 @@ return {
     },
     {
         'echasnovski/mini.comment',
-        event = { "BufReadPre", "BufNewFile" },
+        event = "VeryLazy",
         version = false,
-        dependencies = {
-            {
-                "JoosepAlviste/nvim-ts-context-commentstring",
-                opts = { enable_autocmd = false },
-            },
-        },
         config = function()
-            require('mini.comment').setup({
-                options = {
-                    custom_commentstring = function()
-                        return require('ts_context_commentstring').calculate_commentstring() or vim.bo.commentstring
-                    end,
-                },
-            })
+            require('mini.comment').setup()
         end
     },
 }
