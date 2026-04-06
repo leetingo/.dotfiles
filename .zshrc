@@ -119,12 +119,3 @@ bindkey -s ^b "ssh-connector\n"
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
 
-# JAVA
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
-
-# Maven
-export PATH=/opt/apache-maven-3.9.11/bin:$PATH
-
-export PATH=$HOME/.nvm/versions/node/v22.17.1/bin:$PATH
-
