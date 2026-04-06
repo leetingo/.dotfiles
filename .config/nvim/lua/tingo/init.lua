@@ -7,6 +7,11 @@ local TingoGroup = augroup('Tingo', {})
 
 local autocmd = vim.api.nvim_create_autocmd
 local yank_group = augroup('HighlightYank', {})
+local trim_whitespace_exclude = {
+    diff = true,
+    gitcommit = true,
+    markdown = true,
+}
 
 function R(name)
     require("plenary.reload").reload_module(name)
@@ -26,7 +31,15 @@ autocmd('TextYankPost', {
 autocmd({"BufWritePre"}, {
     group = TingoGroup,
     pattern = "*",
-    command = [[%s/\s\+$//e]],
+    callback = function(args)
+        if trim_whitespace_exclude[vim.bo[args.buf].filetype] then
+            return
+        end
+
+        local view = vim.fn.winsaveview()
+        vim.cmd([[silent! keeppatterns %s/\s\+$//e]])
+        vim.fn.winrestview(view)
+    end,
 })
 
 autocmd('LspAttach', {

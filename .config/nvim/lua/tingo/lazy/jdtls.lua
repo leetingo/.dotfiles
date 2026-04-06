@@ -6,7 +6,31 @@ return {
     },
     ft = "java",
     config = function()
+        local function resolve_java_cmd()
+            local java_cmd = vim.fn.exepath("java")
+            if java_cmd ~= "" then
+                return java_cmd
+            end
+
+            local java_home = vim.env.JAVA_HOME
+
+            if java_home and java_home ~= "" then
+                local java_bin = java_home .. "/bin/java"
+                if vim.uv.fs_stat(java_bin) then
+                    return java_bin
+                end
+            end
+
+            vim.notify("Java executable not found. Set JAVA_HOME or add java to PATH.", vim.log.levels.ERROR)
+            return nil
+        end
+
         local mason_path = vim.fn.stdpath("data") .. "/mason"
+        local java_cmd = resolve_java_cmd()
+
+        if not java_cmd then
+            return
+        end
 
         local jdtls_home = mason_path .. "/packages/jdtls"
         local launcher_path = jdtls_home .. "/plugins/org.eclipse.equinox.launcher_*.jar"
@@ -29,11 +53,12 @@ return {
         local java_test_jars = vim.fn.glob(java_test_path, false, true)
         vim.list_extend(bundles, java_test_jars)
 
-        local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
+        local root_dir = require("jdtls.setup").find_root({ ".git", "mvnw", "gradlew" }) or vim.fn.getcwd()
+        local project_name = vim.fs.basename(vim.fs.normalize(root_dir))
         local workspace_dir = vim.fn.stdpath("cache") .. "/jdtls/workspace/" .. project_name
 
         local cmd = {
-            "/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home/bin/java",
+            java_cmd,
             "-Declipse.application=org.eclipse.jdt.ls.core.id1",
             "-Dosgi.bundles.defaultStartLevel=4",
             "-Declipse.product=org.eclipse.jdt.ls.core.product",
@@ -49,7 +74,7 @@ return {
         }
 
         local config = {
-            root_dir = require("jdtls").setup.find_root({ ".git", "mvnw", "gradlew" }),
+            root_dir = root_dir,
             cmd = cmd,
             init_options = {
                 bundles = bundles,
@@ -68,4 +93,3 @@ return {
         require("jdtls").start_or_attach(config)
     end,
 }
-

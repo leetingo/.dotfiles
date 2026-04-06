@@ -8,9 +8,15 @@ return {
         },
         build = ":TSUpdate",
         config = function()
-            require('nvim-treesitter').setup({
+            require('nvim-treesitter.configs').setup({
                 ensure_installed = { "vim", "vimdoc", "lua" },
                 auto_install = true,
+                highlight = {
+                    enable = true,
+                },
+                indent = {
+                    enable = true,
+                },
             })
 
             vim.api.nvim_create_autocmd("FileType", {
@@ -31,20 +37,27 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         config = function()
             require('nvim-treesitter-textobjects').setup({
                 select = {
-                    enable = true,
                     lookahead = true,
-                    keymaps = {
-                        ["af"] = "@function.outer",
-                        ["if"] = "@function.inner",
-                        ["ac"] = "@class.outer",
-                        ["ic"] = "@class.inner",
-                    },
                 },
             })
+
+            local select = require("nvim-treesitter-textobjects.select")
+            local keymaps = {
+                ["af"] = "@function.outer",
+                ["if"] = "@function.inner",
+                ["ac"] = "@class.outer",
+                ["ic"] = "@class.inner",
+            }
+
+            for lhs, query in pairs(keymaps) do
+                vim.keymap.set({ "x", "o" }, lhs, function()
+                    select.select_textobject(query, "textobjects")
+                end)
+            end
         end,
     },
 }
