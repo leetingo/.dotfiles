@@ -120,9 +120,8 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 [ -f /opt/homebrew/etc/profile.d/autojump.sh ] && . /opt/homebrew/etc/profile.d/autojump.sh
 
 # JAVA
-export JAVA_HOME=$HOME/Library/Java/JavaVirtualMachines/azul-1.8.0_452/Contents/Home
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-21.jdk/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
-export CLASSPATH=$JAVA_HOME/lib/tools.jar:$JAVA_HOME/lib/dt.jar
 
 # Maven
 export PATH=/opt/apache-maven-3.9.11/bin:$PATH
