@@ -1,20 +1,6 @@
 return {
     'mfussenegger/nvim-dap',
-    keys = {
-        "<leader>dB",
-        "<leader>db",
-        "<F5>",
-        "<F6>",
-        "<F7>",
-        "<F10>",
-        "<F11>",
-        "<F12>",
-        "<leader>dr",
-        "<leader>dl",
-        "<leader>dh",
-        "<leader>du",
-        "<leader>de",
-    },
+    event = {"BufReadPre", "BufNewFile"},
     dependencies = {
         "williamboman/mason.nvim",
         "jay-babu/mason-nvim-dap.nvim",
@@ -23,6 +9,8 @@ return {
         "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
+        -- not sure this is needed
+        require("mason").setup()
         require("mason-nvim-dap").setup({
             ensure_installed = {
                 "delve", "codelldb"

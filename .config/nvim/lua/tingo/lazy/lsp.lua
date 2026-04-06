@@ -10,6 +10,7 @@ return {
         "hrsh7th/cmp-cmdline",
         "hrsh7th/nvim-cmp",
         "saadparwaiz1/cmp_luasnip",
+        "JoosepAlviste/nvim-ts-context-commentstring",
         -- "nvimtools/none-ls.nvim",
         -- "jay-babu/mason-null-ls.nvim",
     },
@@ -70,12 +71,12 @@ return {
 
         vim.diagnostic.config({
             virtual_text = true,
-            update_in_insert = false,
+            update_in_insert = true,
             float = {
                 focusable = false,
                 style = "minimal",
                 border = "rounded",
-                source = true,
+                source = "always",
                 header = "",
                 prefix = "",
             },
