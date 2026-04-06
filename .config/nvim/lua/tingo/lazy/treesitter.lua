@@ -52,6 +52,7 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter-textobjects",
+        branch = "main",
         event = { "BufReadPost", "BufNewFile" },
         config = function()
             require('nvim-treesitter-textobjects').setup({
