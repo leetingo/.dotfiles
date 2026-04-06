@@ -1,6 +1,20 @@
 return {
     'mfussenegger/nvim-dap',
-    event = {"BufReadPre", "BufNewFile"},
+    keys = {
+      "<leader>dB",
+      "<leader>db",
+      "<F5>",
+      "<F6>",
+      "<F7>",
+      "<F10>",
+      "<F11>",
+      "<F12>",
+      "<leader>dr",
+      "<leader>dl",
+      "<leader>dh",
+      "<leader>du",
+      "<leader>de",
+    },
     dependencies = {
         "williamboman/mason.nvim",
         "jay-babu/mason-nvim-dap.nvim",

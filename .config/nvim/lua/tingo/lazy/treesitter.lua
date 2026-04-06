@@ -1,13 +1,13 @@
 return {
     "nvim-treesitter/nvim-treesitter",
-    event = "VeryLazy",
+    event = { "BufReadPost", "BufNewFile" },
     dependencies = {
         {
             "nvim-treesitter/nvim-treesitter-textobjects",
             event = "VeryLazy"
         },
         "windwp/nvim-ts-autotag",
-        -- "nvim-treesitter/nvim-treesitter-context",
+        "nvim-treesitter/nvim-treesitter-context",
         "RRethy/vim-illuminate",
     },
     build = ":TSUpdate",
@@ -51,5 +51,12 @@ return {
             }
         })
         require('nvim-ts-autotag').setup()
+        require("treesitter-context").setup({
+          max_lines = 1,
+          multiline_threshold = 1,
+          trim_scope = "outer",
+          separator = nil,
+          -- patterns = { default = { "function", "method" } },
+        })
     end
 }

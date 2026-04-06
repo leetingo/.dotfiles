@@ -1,7 +1,7 @@
 return {
     {
         'echasnovski/mini.ai',
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         version = false,
         config = function()
             local ai = require('mini.ai')
@@ -21,7 +21,7 @@ return {
     },
     {
         'echasnovski/mini.pairs',
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         version = false,
         config = function()
             require('mini.pairs').setup({
@@ -40,7 +40,7 @@ return {
     },
     {
         'echasnovski/mini.surround',
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         version = false,
         config = function()
             require('mini.surround').setup()
@@ -48,7 +48,7 @@ return {
     },
     {
         'echasnovski/mini.comment',
-        event = "VeryLazy",
+        event = { "BufReadPost", "BufNewFile" },
         version = false,
         config = function()
             require('mini.comment').setup()
