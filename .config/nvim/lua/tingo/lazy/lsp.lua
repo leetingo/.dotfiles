@@ -7,12 +7,8 @@ return {
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-buffer",
         "hrsh7th/cmp-path",
-        "hrsh7th/cmp-cmdline",
-        { "hrsh7th/nvim-cmp", event = "InsertEnter" },
+        "hrsh7th/nvim-cmp",
         "saadparwaiz1/cmp_luasnip",
-        "JoosepAlviste/nvim-ts-context-commentstring",
-        -- "nvimtools/none-ls.nvim",
-        -- "jay-babu/mason-null-ls.nvim",
     },
     config = function()
         local capabilities = require('cmp_nvim_lsp').default_capabilities()
@@ -35,16 +31,13 @@ return {
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",
+                "gopls",
+                "rust_analyzer",
+                "zls",
+                "basedpyright",
+                "jsonls",
             },
         })
-
-        -- require("null-ls").setup()
-        -- require("mason-null-ls").setup({
-        --     ensure_installed = {
-        --     },
-        --     automatic_installation = true,
-        --     handlers = {},
-        -- })
 
         local cmp = require('cmp')
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -71,7 +64,6 @@ return {
 
         vim.diagnostic.config({
             virtual_text = true,
-            update_in_insert = true,
             float = {
                 focusable = false,
                 style = "minimal",

@@ -2,6 +2,7 @@ return {
     {
         "rose-pine/neovim",
         name = "rose-pine",
+        priority = 1000,
         config = function()
             require("rose-pine").setup({
                 disable_background = true,
@@ -9,11 +10,6 @@ return {
                     italic = false,
                 },
                 highlight_groups = {
-                    -- JDTLS non-standard semantic token types
-                    ["@lsp.type.annotation"] = { link = "@attribute" },
-                    ["@lsp.type.annotationMember"] = { link = "@property" },
-                    ["@lsp.type.record"] = { link = "@type" },
-                    ["@lsp.type.recordComponent"] = { link = "@variable.member" },
                     -- Fix LSP semantic tokens overriding treesitter highlights
                     ["@lsp.type.keyword"] = {},
                     ["@lsp.type.modifier"] = {},

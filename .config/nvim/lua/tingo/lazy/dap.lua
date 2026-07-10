@@ -23,7 +23,6 @@ return {
         "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
-        -- not sure this is needed
         require("mason").setup()
         require("mason-nvim-dap").setup({
             ensure_installed = {

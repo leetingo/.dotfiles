@@ -46,12 +46,4 @@ return {
             require('mini.surround').setup()
         end
     },
-    {
-        'echasnovski/mini.comment',
-        event = { "BufReadPost", "BufNewFile" },
-        version = false,
-        config = function()
-            require('mini.comment').setup()
-        end
-    },
 }
