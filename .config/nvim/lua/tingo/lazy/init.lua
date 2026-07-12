@@ -35,6 +35,6 @@ return {
     },
     {
         "tpope/vim-fugitive",
-        event = "VeryLazy"
+        cmd = { "Git", "G", "Gedit", "Gdiffsplit", "Gvdiffsplit", "Gread", "Gwrite", "Gclog" },
     }
 }
