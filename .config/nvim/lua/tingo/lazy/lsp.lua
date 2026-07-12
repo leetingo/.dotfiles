@@ -1,8 +1,8 @@
 return {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-        "williamboman/mason.nvim",
+        { "mason-org/mason.nvim", opts = {} },
         "neovim/nvim-lspconfig",
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-buffer",
@@ -27,7 +27,6 @@ return {
                 },
             },
         })
-        require("mason").setup()
         require("mason-lspconfig").setup({
             ensure_installed = {
                 "lua_ls",

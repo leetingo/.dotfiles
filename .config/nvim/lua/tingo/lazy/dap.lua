@@ -16,14 +16,13 @@ return {
       "<leader>de",
     },
     dependencies = {
-        "williamboman/mason.nvim",
+        "mason-org/mason.nvim",
         "jay-babu/mason-nvim-dap.nvim",
         "nvim-neotest/nvim-nio",
         "rcarriga/nvim-dap-ui",
         "theHamsta/nvim-dap-virtual-text",
     },
     config = function()
-        require("mason").setup()
         require("mason-nvim-dap").setup({
             ensure_installed = {
                 "delve", "codelldb"
