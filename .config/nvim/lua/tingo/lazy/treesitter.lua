@@ -33,10 +33,6 @@ return {
                 group = group,
                 pattern = "*",
                 callback = function(args)
-                    if vim.bo[args.buf].filetype == "markdown" then
-                        vim.bo[args.buf].syntax = "on"
-                    end
-
                     local ft = vim.bo[args.buf].filetype
                     local lang = vim.treesitter.language.get_lang(ft) or ft
 
@@ -62,29 +58,10 @@ return {
         end,
     },
     {
+        -- no keymaps of its own: kept only as the source of textobject
+        -- queries (@function.outer etc.) consumed by mini.ai
         "nvim-treesitter/nvim-treesitter-textobjects",
         branch = "main",
         event = { "BufReadPost", "BufNewFile" },
-        config = function()
-            require('nvim-treesitter-textobjects').setup({
-                select = {
-                    lookahead = true,
-                },
-            })
-
-            local select = require("nvim-treesitter-textobjects.select")
-            local keymaps = {
-                ["af"] = "@function.outer",
-                ["if"] = "@function.inner",
-                ["ac"] = "@class.outer",
-                ["ic"] = "@class.inner",
-            }
-
-            for lhs, query in pairs(keymaps) do
-                vim.keymap.set({ "x", "o" }, lhs, function()
-                    select.select_textobject(query, "textobjects")
-                end)
-            end
-        end,
     },
 }
